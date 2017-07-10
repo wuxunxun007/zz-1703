@@ -1,9 +1,9 @@
 //定义接口
 var MyServer = {
-	server:function(req,res){
+	server:function(req,res,str){
 		res.setHeader("Access-Control-Allow-Origin","*");
 		res.writeHead(200, {'Content-Type': 'text/html'});
-		res.write("<h1>hello world111111111111</h1>");
+		res.write(str);
 		res.end();
 	}
 }

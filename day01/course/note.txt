@@ -1,0 +1,54 @@
+1、使用URl模块
+	href
+	protocal       + host        + path            + hash
+	协议     + （hostname + port） + (pathname+search)  
+	                                       (? + query)
+	
+	打开控制台
+		node    ---   shell终端---控制台
+		url    --- url模块的一些功能
+		url.parse("http://www.wxx.com:3000/nodecourse?classId=1703")
+		url.parse("http://www.wxx.com:3000/nodecourse?classId=1703",false)     ---  同上，没有变化
+		url.parse("http://www.wxx.com:3000/nodecourse?classId=1703",true) --- query转成对象
+		url.format(urlObject)  ---   将一个url对象转换成一个字符串，urlObject用上面生成的实例
+		url.format({
+		  protocol: 'http:',
+		  slashes: true,
+		  auth: null,
+		  host: 'www.wxx.com:3000',
+		  port: '3000',
+		  hostname: 'www.wxx.com',
+		  hash: null,
+		  search: '?classId=1703',
+		  query: 'classId=1703',
+		  pathname: '/nodecourse',
+		  path: '/nodecourse?classId=1703',
+		  href: 'http://www.wxx.com:3000/nodecourse?classId=1703' })
+		//加斜杠表示绝对路径，直接相对于域名或者端口号后边的内容直接放置，不加表示相对路径，最后一个斜杠后的内容将被替换
+		url.resolve() 方法会以一种 Web 浏览器解析超链接的方式把一个目标 URL 解析成相对于一个基础 URL。
+		url.resolve('/one/two/three', 'four')         // '/one/two/four'
+		url.resolve('http://example.com/', '/one')    // 'http://example.com/one'
+		url.resolve('http://example.com/one', '/two') // 'http://example.com/two'
+				****
+					体现相对于绝对位置的变化
+					如果to的参数相对应有/，代表就会从根目录下进行替换，如果没有，则继续在后面添加
+					url.resolve('http://example.com/one/test', '/two')  ---  用于验证
+						'http://example.com/two'     ---  ok
+				****
+2、querystring模块  ---- 查询字符串
+	使用url模块的url.parse(urlString,true/false)	
+		true,query 属性总会通过 querystring 模块的 parse() 方法生成一个对象
+		url.parse("http://www.wxx.com:3000/nodecourse?classId=1703",true).query
+	querystring
+		querystring.parse(url.parse("http://www.wxx.com:3000/nodecourse?classId=1703",false).query)
+			***querystring.parse使用的是 类似于classId=1703会将其转换为{"classId":1703}
+		querystring.stringify({"classId":1703,"course":"nodejs"})
+			***将对象此方法转换成类似于'classId=1703&course=nodejs'格式
+		querystring.stringify({"classId":1703,"course":"nodejs"},",");
+			***连接符变成,
+		querystring.stringify({"classId":1703,"course":"nodejs"},",",":");
+			***连接符变成,对象变为classId:1703,course:nodejs
+		querystring.escape(str)   ---   为了统一性（不同的国家，不同的浏览器识别性可能不一样）---- 加密，定义规则
+			querystring.escape("郑州")  %E9%83%91%E5%B7%9E
+		querystring.unescape(str)   ---   解密，解析规则
+			querystring.unescape("%E9%83%91%E5%B7%9E")
