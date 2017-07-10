@@ -1,0 +1,216 @@
+六、mongdb介绍与环境搭建
+	MongoDB是一个基于分布式文件存储的数据库。由C++语言编写。旨在为WEB应用提供可扩展的高性能数据存储解决方案。
+它的特点:高性能、易部署、易使用，存储数据非常方便。
+	对mongodb创建一个数据库存储的文件夹 ，要求在系统的目录下创建一个文件夹data,在data文件夹下创建了一个db
+	
+	制作.bat文件
+		
+	术语介绍
+	  SQL            mongoDB			 说明
+	database		 database			数据库
+	table			 collection			表/集合
+	row				 document			行/文档
+	column			 field				字段（列）/域
+	index			 index				索引
+	primary key	     primary key		主键，mongdb中_id作为主键
+	
+	一个mongodb中可以建立多个数据库
+	MongoDB的默认数据库为"db"，该数据库存储在data目录中。
+	MongoDB的单个实例可以容纳多个独立的数据库，每一个都有自己的集合和权限，不同的数据库也放置在不同的文件中。
+
+	
+	shell使用
+		进入shell
+			mongo.exe
+七、数据库常用命令
+	1、help查看命令提示
+		help
+		db.help()
+		db.test.help()
+		db.test.find().help()
+	2、创建、切换数据库
+		use movies
+	3、查询数据库
+		show dbs
+	4、显示当前DB状态
+		db.stats()
+	5、查看当前DB版本
+		db.version()
+	6、查看当前DB的链接机器地址
+		db.getMongo()
+	7、删除数据库
+		db.dropDatabase()
+	8、查询当前所使用的数据库
+		db.getName()
+八、collection聚集集合操作
+	1、创建一个聚集集合
+		//collName   相当于表的名称
+		db.createCollection("collName", {size: 20, capped: true, max: 100});
+		db.collName.isCapped(); //判断集合是否为定容量
+		
+		mySQL: INSERT INTO table_name ( field1 ) VALUES  ( value1 );
+	2、得到指定名称的聚集集合
+		db.getCollection("collName");
+	3、得到当前DB的所有的聚集集合
+		db.getCollectionNames();
+	4、显示当前db所有集合的状态
+		db.printCollectionStats();
+
+九、document文档操作
+	1、插入文档
+		db.users.save({name: 'zhangsan', age: 25, sex: 1});
+		db.users.insert({name: 'zhangsan', age: 25, sex: 1});
+		插入单条数据 db.users.insertOne({});
+		插入多条数据db.users.insertMany([{},{}])
+	
+	2、更新文档
+		db.users.updaeMany({},{$set:{class:"1638"}})
+		
+		//false表示如果不存在不会插入，true表示如果有多个内容都更新（如果为false，则只更新第一条）
+		db.users.update({age: 25}, {$set: {name: 'changeName'}}, false, true);
+		相当于：update users set name = ‘changeName' where age = 25;
+		db.users.update({name: 'Lisi'}, {$inc: {age: 50}}, false, true);
+		相当于：update users set age = age + 50 where name = ‘Lisi';
+		db.users.update({name: 'Lisi'}, {$inc: {age: 50}, $set: {name: 'hoho'}}, false, true);
+		相当于：update users set age = age + 50, name = ‘hoho' where name = ‘Lisi';
+	3、获得当前db的所有文档
+		查询所有记录
+			db.userInfo.find();
+			相当于：select* from userInfo;
+		查询去重后数据
+			db.userInfo.distinct("name");
+			相当于：select distict name from userInfo;
+		查询age = 22的记录
+			db.userInfo.find({"age": 22});
+			相当于： select * from userInfo where age = 22;
+		查询age > 22的记录
+			db.userInfo.find({age: {$gt: 22}});
+			相当于：select * from userInfo where age >22;
+		查询age < 22的记录
+			db.userInfo.find({age: {$lt: 22}});
+			相当于：select * from userInfo where age <22;
+		
+		查询age >= 25的记录
+			db.userInfo.find({age: {$gte: 25}});
+			相当于：select * from userInfo where age >= 25;
+		查询age <= 25的记录
+			db.userInfo.find({age: {$lte: 25}});
+		查询age >= 23 并且 age <= 26
+			db.userInfo.find({age: {$gte: 23, $lte: 26}});
+		查询name中包含 mongo的数据
+			db.userInfo.find({name: /mongo/});
+			//相当于%%
+			select * from userInfo where name like ‘%mongo%’;
+		查询name中以mongo开头的
+			db.userInfo.find({name: /^mongo/});
+			select * from userInfo where name like ‘mongo%’;
+
+
+	4、删除文档
+		db.users.remove({age: 132},true);
+		删除多条
+			db.users.deleteMany({class:"1638"})
+		删除所有
+			db.users.remove({})	
+	5、简单查询文档
+		查询指定列name、age数据
+			db.userInfo.find({}, {name: 1, age: 1});
+			相当于：select name, age from userInfo;
+		查询指定列name、age数据, age > 25
+			db.userInfo.find({age: {$gt: 25}}, {name: 1, age: 1});
+			相当于：select name, age from userInfo where age >25;
+		按照年龄排序
+			升序：db.userInfo.find().sort({age: 1});
+			降序：db.userInfo.find().sort({age: -1});
+		查询name = zhangsan, age = 22的数据
+			db.userInfo.find({name: 'zhangsan', age: 22});
+			相当于：select * from userInfo where name = ‘zhangsan' and age = ’22';
+		查询前5条数据
+			db.userInfo.find().limit(5);
+			相当于：select top 5 * from userInfo;
+		查询10条以后的数据
+			db.userInfo.find().skip(10);
+			相当于：select * from userInfo where id not in (
+			   select top 10 * from userInfo
+			);
+		查询在5-10之间的数据
+			db.userInfo.find().limit(5).skip(5);
+		or与 查询
+			db.userInfo.find({$or: [{age: 22}, {age: 25}]});
+			相当于：select * from userInfo where age = 22 or age = 25;
+		查询第一条数据
+			db.userInfo.findOne();
+			相当于：selecttop 1 * from userInfo;
+			db.userInfo.find().limit(1);
+		查询某个结果集的记录条数
+			db.userInfo.find({age: {$gte: 25}}).count();
+			相当于：select count(*) from userInfo where age >= 20;
+		按照某列进行排序计数
+			db.userInfo.find({sex: {$exists: true}}).count();
+			相当于：select count(sex) from userInfo;
+
+十、聚集集合查询
+	1、条件操作符
+	
+	2、Limit与skip方法
+	
+	3、排序
+	
+	4、索引
+
+十一、NodeJS链接MongDB
+	创建一个mongdb.js
+		var mongodb = require('mongodb')
+		// 创建数据库服务的链接
+		var server = new mongodb.Server(
+		  'localhost',
+		  27017,
+		  { auto_reconnect: true}
+		)
+		// 创建数据的连接
+		var db = new mongodb.Db(
+		  'movies',
+		  server,
+		  { safe: true }
+		)
+		// 测试数据库连接
+		db.open(function(err, db){
+		  if (err) {
+		    console.log('log-' + err)
+		  } else {
+		    console.log('log-connect mongodb success!')
+		    db.collection('movie', {safe: true}, function(err, conn){
+		      if (err) {
+		        console.log(err)
+		      } else {
+		        conn.find({}, {title:1, year:1, _id:0}).limit(3).skip(3).toArray(function(err, res){
+		          if(!err) {
+		            res.forEach(function(value){
+		              console.log(value.title)
+		            })
+		          }
+		        })
+		      }
+		    })
+		  }
+		})
+十二、作业
+	1、理解上课所讲的知识点
+	2、自学npm scripts内容
+	3、安装MongDB数据库
+	4、练习数据库的操作命令
+	5、构建一个NodeJS+MongDB的登录注册功能
+		1）、编写注册表页面
+		2）、提交表单入库
+		3）、编写登录页面
+		4）、实现登录功能
+		5）、应用路由访问登录注册页面
+
+
+
+
+
+
+
+
+

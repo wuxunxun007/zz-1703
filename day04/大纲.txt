@@ -1,0 +1,126 @@
+一、express介绍
+	基于 Node.js 平台，快速、开放、极简的 web 开发框架。
+	http://www.expressjs.com.cn/
+	
+二、安装和创建基于express的项目
+	cnpm install express -g
+	express -h     帮助信息
+	
+	如果出现错误信息(moc系统一般不会出现)
+		cnpm install express-generator -g
+	
+	创建一个express开发目录
+		express -e express
+	执行命令
+		cnpm install
+	
+三、express4.1x初始化项目详解
+	"body-parser":解析前端提交的数据
+    "cookie-parser": 解析cookie,
+    "debug": 显示调试信息，代替console.log,
+    "ejs": express的一个模板，渲染页面,
+    "express": ,
+    "morgan": 日志，控制格式化显示request信息,
+    "serve-favicon": 设置根目录的icon图标
+    
+    www文件为一个入口文件，实现了创建一个服务和进行一些中间件和路由的一些配置的内容
+	
+四、路由简介
+	
+五、模板引擎EJS
+	1、什么是EJS
+		EJS是一个简单高效的模板语言，通过数据和模板，可以生成HTML标记文本。可以说EJS是一个JavaScript库，EJS可以同时运行在客户端和服务器端，客户端安装直接引入文件即可，服务器端用npm包安装
+
+	2、EJS模板的特点
+		快速编译和渲染
+		简单的模板标签
+		自定义标记分隔符
+		支持文本包含
+		支持浏览器端和服务器端
+		模板静态缓存
+		支持express视图系统
+
+	3、EJS的成员函数
+		Render(str,data,[option]):直接渲染字符串并生成html
+			str：需要解析的字符串模板
+			data：数据
+			option：配置选项
+
+	4、EJS常用的标签
+		<% %>流程控制标签
+		<%= %>输出标签（原文输出HTML标签）
+		<%- %>输出标签（HTML会被浏览器解析）
+		<%# %>注释标签
+		% 对标记进行转义
+
+	5、includes使用
+		<ul>
+		  <% users.forEach(function(user){ %>
+		    <%- include('user/show', {user: user}); %>
+		  <% }); %>
+		</ul>
+
+六、登录
+	编写登录界面,采用post提交
+	在users路由中设置登录接口/users/loginAction
+	router.post("/loginAction",(req,res)=>{
+		//获取前端提交的数据 body-parser模块
+		var username = req.body["username"];
+		var password = req.body["password"];
+	});
+	
+	
+	如果要连接数据库，下载mongodb   cnpm install mongodb --save-dev
+	1、创建客户端
+	var MongoClient = require("mongodb").MongoClient;
+	2、设置连接到指定数据库
+	var DB_CONN_STR = "mongodb://localhost:27017/expressPro";
+	3、//进行数据库的连接
+	MongoClient.connect(DB_CONN_STR,(err,db)=>{
+		if(err){
+			console.log(err);
+		}else{
+			console.log("数据库链接成功");
+			//查询是不是有该用户
+		}
+	});
+	4、查询数据方法
+	//查询数据库函数
+	var findData = (db,username,password,callback)=>{
+		//链接用户表
+		var conn = db.collection("user");
+		//构建查询数据格式
+		var data = {username:username,password:password};
+		//查询数据，并且转为对象数组,result
+		conn.find(data,{_id:0}).toArray((err,result)=>{
+			if(err){
+				console.log(err)
+			}else{
+				callback(result);
+			}
+			
+		});
+	}
+	5、设置session
+	安装express-session模块，app.js中配置
+		//引入我们的session  cnpm install express-session  --save
+		var session = require("express-session");
+	//配置session
+		app.use(session({
+		  secret:"recommend 128 bytes random string",
+		  cookie:{maxAge:20*20*1000},
+		  resave:true,
+		  saveUnintialized:true
+		
+		}))
+	登录成功设置session
+		req.session.username = username;
+	获取session
+		req.session.username
+	重定向
+		res.redirect("/");
+七、注册
+
+八、注销
+	req.session.username = undefined;
+	res.redirect("/");

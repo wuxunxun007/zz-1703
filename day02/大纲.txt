@@ -1,0 +1,430 @@
+一、路由初步
+	                   url.parse(string).query
+                                           |
+           url.parse(string).pathname      |
+                       |                   |
+                       |                   |
+                     ------ -------------------
+http://localhost:8888/start?foo=bar&hello=world
+                                ---       -----
+                                 |          |
+                                 |          |
+            querystring.parse(string)["foo"]    |
+                                            |
+                    querystring.parse(string)["hello"]
+
+
+	创建一个router_1.js
+		var http = require('http')
+		var url = require('url')
+		
+		http.createServer(function(req, res){
+		  res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'})
+		  if(req.url !== '/favicon.ico') {
+		    var pathName = url.parse(req.url).pathname
+		    console.log(pathName)
+		  }
+		  res.end()
+		}).listen(8000)
+
+		console.log('Server running at http://localhost:8000')
+		
+		
+		安装supervisor模块，可以不用每次启动js，使用命令supervisor route_1.js
+		
+		
+		创建一个modules/routers.js
+
+		module.exports = {
+		  home: function(req, res) {
+		     res.write('首页')
+		  },
+		  login: function(req, res) {
+		  	 res.write('登录页面')
+		  },
+		  registor: function (req, res) {
+		    res.write('注册页面')
+		  }
+		}
+		
+		修改router_1.js
+		var router = require('./modules/router')
+		
+		var pathName = url.parse(req.url).pathname.replace(/\//, '')
+	    console.log(pathName)
+	    try {
+	      router[pathName](req, res)
+	    } catch(err) {
+	      router['home'](req, res)
+	    }
+二、读取图片文件
+	将router_1.js另存为router_2.js
+	更改头部信息如下
+		res.writeHead(200,{"Content-Type":"image/jpeg"})；
+	在modules/router.js中添加读取文件路由
+		img:function(req,res){
+			file.readImg('./images/pet.jpg', res)
+		}
+	创建modules/file.js
+		var fs = require('fs')
+		readImg: function (file, res) {
+		    fs.readFile(file, 'binary', function (err, data) {
+		      if (err) throw err
+		      res.writeHead(200, {'Content-Type': 'image/jpeg'})
+		      res.write(data, 'binary')
+		      res.end()
+		    })
+		}
+		此时可以删除router_2.js中的res.end()
+		在router.js中导入file.js
+		var file = require('./file')
+		
+		此时发现如果在输出图片时没法正确显示
+		res.write('test');
+		res.write(data, 'binary')
+三、路由改造
+	在file.js删除
+		res.write('test');
+	创建文件views/home.html
+		<!DOCTYPE html>
+		<html lang="en">
+		<head>
+		  <meta charset="UTF-8">
+		  <title>Document</title>
+		</head>
+		<body>
+		  首页
+		  <!-- ./img为一个图片请求 -->
+		  <img src="./img" alt="">
+		</body>
+		</html>
+	在file.js中创建一个模块readFile方法
+		readFile: function (file, res, req) {
+		    fs.readFile(file, 'utf-8', function (err, data) {
+		      if (err) throw err
+		      res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'})
+		      res.write(data)
+		      res.end()
+		    })
+		  },
+	更改touter2_.js中的代码，保证是一个干净的路由请求
+		if(req.url !== '/favicon.ico') {
+		    var pathName = url.parse(req.url).pathname.replace(/\//, '')
+		    try {
+		      router[pathName](req, res)
+		    } catch(err) {
+		      router['home'](req, res)
+		    }
+		  }
+	在router.js中的home路由中设置
+		home: function(req, res) {
+		    file.readFile('./views/home.html', res, req)
+		},
+四、参数接收
+	
+	创建文件views/login.html
+		<form action="./login" method="get" >
+		    <label for="email">
+		      E-mail: <input type="text" name="email" value="" />
+		    </label>
+		    <label for="password">
+		      密码：<input type="password" name="password" value="" />
+		    </label>
+		    <label for="submit">
+		      <input type="submit" value="提交" />
+		    </label>
+		  </form>
+	更改路由router.js中的login方法
+		login:function(req,res){
+			var urlObject = url.parse(req.url,true).query;
+			console.log(urlObject.email)
+			console.log(urlObject.password)
+			file.readFile("./views/login.html",res,req);
+		}
+		
+	post请求
+		修改files.js
+			引入querystring;
+			var queryString = require('querystring')
+		更改login方法
+			login: function(req, res) {
+			    var post = ''
+			    req.on('data', function(chunk){
+			      post += chunk
+			    })
+			    req.on('end', function() {
+				    var urlObject = queryString.parse(post);
+					console.log(urlObject.email)
+					console.log(urlObject.password)
+					file.readFile("./views/login.html",res,req);
+			    })
+			  },	
+		更改views/login.html中请求的方法
+			action="./login" method="POST" 
+		
+		如果需要将提交的数据显示到页面
+			在file.js中添加一个方法
+				postReadFile: function (file, res, req, post) {
+				    var urlObject = queryString.parse(post)
+				    var array = ['email', 'password']
+				    var reg;
+				
+				    fs.readFile(file, 'utf-8', function(err, data){
+				      if(err) throw err
+				      res.writeHead(200, {'Content_Type': 'text/html; charset=utf-8'})
+				
+				      for(var i = 0; i < array.length; i++) {
+				        reg = new RegExp('{' + array[i] + '}', 'gi')
+				        data = data.replace(reg, urlObject[array[i]])
+				      }
+				      res.write(data)
+				      res.end()
+				    })
+				  },
+			更改router.js中的login方法
+				req.on('end', function() {
+			      	file.postReadFile('./views/login.html', res, req, post)
+			    })
+			在login.html中添加显示信息
+			 <div >
+			    Email:{email}, 密码：{password}
+			  </div>
+			如果第一次的时候我们发现显示不友好
+				可以设置一个样式
+					.hide{
+						display:none
+					}
+					在div中添加class="{infoClass}"
+					在form中设置class="{formClass}"
+				在file.js中postReadFile中添加处理email和password代码，放在for循环之后
+					if (urlObject.email && urlObject.password) {
+				        data = data.replace(new RegExp('{infoClass}', 'gi'), '')
+				        data = data.replace(new RegExp('{formClass}', 'gi'), 'hide')
+				      } else {
+				        data = data.replace(new RegExp('{infoClass}', 'gi'), 'hide')
+				        data = data.replace(new RegExp('{formClass}', 'gi'), '')
+				      }
+					
+
+五、npm scripts
+	可以修改package.json中的scripts中的
+	"build":"node async.js"
+	命令行执行npm run build
+	使用npm run 可以查看可运行命令
+	
+六、mongdb介绍与环境搭建
+	MongoDB是一个基于分布式文件存储的数据库。由C++语言编写。旨在为WEB应用提供可扩展的高性能数据存储解决方案。
+它的特点:高性能、易部署、易使用，存储数据非常方便。
+	对mongodb创建一个数据库存储的文件夹 ，要求在系统的目录下创建一个文件夹data,在data文件夹下创建了一个db
+	
+	制作.bat文件
+		
+	术语介绍
+	  SQL            mongoDB			 说明
+	database		 database			数据库
+	table			 collection			表/集合
+	row				 document			行/文档
+	column			 field				字段（列）/域
+	index			 index				索引
+	primary key	     primary key		主键，mongdb中_id作为主键
+	
+	一个mongodb中可以建立多个数据库
+	MongoDB的默认数据库为"db"，该数据库存储在data目录中。
+	MongoDB的单个实例可以容纳多个独立的数据库，每一个都有自己的集合和权限，不同的数据库也放置在不同的文件中。
+
+	
+	shell使用
+		进入shell
+			mongo.exe
+七、数据库常用命令
+	1、help查看命令提示
+		help
+		db.help()
+		db.test.help()
+		db.test.find().help()
+	2、创建、切换数据库
+		use movies
+	3、查询数据库
+		show dbs
+	4、显示当前DB状态
+		db.stats()
+	5、查看当前DB版本
+		db.version()
+	6、查看当前DB的链接机器地址
+		db.getMongo()
+	7、删除数据库
+		db.dropDatabase()
+	8、查询当前所使用的数据库
+		db.getName()
+八、collection聚集集合操作
+	1、创建一个聚集集合
+		//collName   相当于表的名称
+		db.createCollection("collName", {size: 20, capped: true, max: 100});
+		db.collName.isCapped(); //判断集合是否为定容量
+		
+		mySQL: INSERT INTO table_name ( field1 ) VALUES  ( value1 );
+	2、得到指定名称的聚集集合
+		db.getCollection("collName");
+	3、得到当前DB的所有的聚集集合
+		db.getCollectionNames();
+	4、显示当前db所有集合的状态
+		db.printCollectionStats();
+
+九、document文档操作
+	1、插入文档
+		db.users.save({name: 'zhangsan', age: 25, sex: 1});
+		db.users.insert({name: 'zhangsan', age: 25, sex: 1});
+		插入单条数据 db.users.insertOne({});
+		插入多条数据db.users.insertMany([{},{}])
+	
+	2、更新文档
+		db.users.updaeMany({},{$set:{class:"1638"}})
+		
+		//false表示如果不存在不会插入，true表示如果有多个内容都更新（如果为false，则只更新第一条）
+		db.users.update({age: 25}, {$set: {name: 'changeName'}}, false, true);
+		相当于：update users set name = ‘changeName' where age = 25;
+		db.users.update({name: 'Lisi'}, {$inc: {age: 50}}, false, true);
+		相当于：update users set age = age + 50 where name = ‘Lisi';
+		db.users.update({name: 'Lisi'}, {$inc: {age: 50}, $set: {name: 'hoho'}}, false, true);
+		相当于：update users set age = age + 50, name = ‘hoho' where name = ‘Lisi';
+	3、获得当前db的所有文档
+		查询所有记录
+			db.userInfo.find();
+			相当于：select* from userInfo;
+		查询去重后数据
+			db.userInfo.distinct("name");
+			相当于：select distict name from userInfo;
+		查询age = 22的记录
+			db.userInfo.find({"age": 22});
+			相当于： select * from userInfo where age = 22;
+		查询age > 22的记录
+			db.userInfo.find({age: {$gt: 22}});
+			相当于：select * from userInfo where age >22;
+		查询age < 22的记录
+			db.userInfo.find({age: {$lt: 22}});
+			相当于：select * from userInfo where age <22;
+		
+		查询age >= 25的记录
+			db.userInfo.find({age: {$gte: 25}});
+			相当于：select * from userInfo where age >= 25;
+		查询age <= 25的记录
+			db.userInfo.find({age: {$lte: 25}});
+		查询age >= 23 并且 age <= 26
+			db.userInfo.find({age: {$gte: 23, $lte: 26}});
+		查询name中包含 mongo的数据
+			db.userInfo.find({name: /mongo/});
+			//相当于%%
+			select * from userInfo where name like ‘%mongo%’;
+		查询name中以mongo开头的
+			db.userInfo.find({name: /^mongo/});
+			select * from userInfo where name like ‘mongo%’;
+
+
+	4、删除文档
+		db.users.remove({age: 132},true);
+		删除多条
+			db.users.deleteMany({class:"1638"})
+		删除所有
+			db.users.remove({})	
+	5、简单查询文档
+		查询指定列name、age数据
+			db.userInfo.find({}, {name: 1, age: 1});
+			相当于：select name, age from userInfo;
+		查询指定列name、age数据, age > 25
+			db.userInfo.find({age: {$gt: 25}}, {name: 1, age: 1});
+			相当于：select name, age from userInfo where age >25;
+		按照年龄排序
+			升序：db.userInfo.find().sort({age: 1});
+			降序：db.userInfo.find().sort({age: -1});
+		查询name = zhangsan, age = 22的数据
+			db.userInfo.find({name: 'zhangsan', age: 22});
+			相当于：select * from userInfo where name = ‘zhangsan' and age = ’22';
+		查询前5条数据
+			db.userInfo.find().limit(5);
+			相当于：select top 5 * from userInfo;
+		查询10条以后的数据
+			db.userInfo.find().skip(10);
+			相当于：select * from userInfo where id not in (
+			   select top 10 * from userInfo
+			);
+		查询在5-10之间的数据
+			db.userInfo.find().limit(5).skip(5);
+		or与 查询
+			db.userInfo.find({$or: [{age: 22}, {age: 25}]});
+			相当于：select * from userInfo where age = 22 or age = 25;
+		查询第一条数据
+			db.userInfo.findOne();
+			相当于：selecttop 1 * from userInfo;
+			db.userInfo.find().limit(1);
+		查询某个结果集的记录条数
+			db.userInfo.find({age: {$gte: 25}}).count();
+			相当于：select count(*) from userInfo where age >= 20;
+		按照某列进行排序计数
+			db.userInfo.find({sex: {$exists: true}}).count();
+			相当于：select count(sex) from userInfo;
+
+十、聚集集合查询
+	1、条件操作符
+	
+	2、Limit与skip方法
+	
+	3、排序
+	
+	4、索引
+
+十一、NodeJS链接MongDB
+	创建一个mongdb.js
+		var mongodb = require('mongodb')
+		// 创建数据库服务的链接
+		var server = new mongodb.Server(
+		  'localhost',
+		  27017,
+		  { auto_reconnect: true}
+		)
+		// 创建数据的连接
+		var db = new mongodb.Db(
+		  'movies',
+		  server,
+		  { safe: true }
+		)
+		// 测试数据库连接
+		db.open(function(err, db){
+		  if (err) {
+		    console.log('log-' + err)
+		  } else {
+		    console.log('log-connect mongodb success!')
+		    db.collection('movie', {safe: true}, function(err, conn){
+		      if (err) {
+		        console.log(err)
+		      } else {
+		        conn.find({}, {title:1, year:1, _id:0}).limit(3).skip(3).toArray(function(err, res){
+		          if(!err) {
+		            res.forEach(function(value){
+		              console.log(value.title)
+		            })
+		          }
+		        })
+		      }
+		    })
+		  }
+		})
+十二、作业
+	1、理解上课所讲的知识点
+	2、自学npm scripts内容
+	3、安装MongDB数据库
+	4、练习数据库的操作命令
+	5、构建一个NodeJS+MongDB的登录注册功能
+		1）、编写注册表页面
+		2）、提交表单入库
+		3）、编写登录页面
+		4）、实现登录功能
+		5）、应用路由访问登录注册页面
+
+
+
+
+
+
+
+
+

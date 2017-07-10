@@ -1,0 +1,482 @@
+一、什么是NodeJS
+	Node.js 是一个基于 Chrome V8 引擎的 JavaScript 运行环境。
+	Node.js 使用了一个事件驱动、非阻塞式 I/O 的模型，使其轻量又高效。
+	Node.js 的包管理器 npm，成为世界上最大的开放源代码的生态系统。
+	淘宝镜像、：http://npm.taobao.org/
+		npm install -g cnpm --registry=https://registry.npm.taobao.org
+二、NodeJS怎样
+	Node.js 可以解析JS代码（没有浏览器安全级别的限制）提供很多系统级别的API，如：
+	文件的读写
+	进程的管理
+	网络通信
+	......
+三、为什么要学习NodeJs
+	列举一些基于Node的工具或者框架
+		Node-Webkit：基于node的webkit的内核
+		NodeOS：基于node的操作系统
+		Express：基于node的框架
+		Jade：模板
+		EJS：模板
+		Forever：负载均衡
+		PM2：负载均衡
+		Log.io：浏览器打印各种输出日志，报错等
+		Grunt、Gulp、Webpack：前端工程化工具
+		Mocha、Karma：前端测试工具
+		......
+四、学习nodeJS的五个网站
+	node官网：https://nodejs.org/en/   -------下载node，官方API，更新日志，发布的动态
+	npm官网：https://www.npmjs.com/search?q=    -------可以搜索你需要的模块，模块管理、组件安装
+	github：https://github.com/search?utf8=%E2%9C%93&q=nodejs     ----源代码
+	国外技术博客：http://stackoverflow.com/questions			-----使用nodejs遇到的问题
+	国内的技术博客：https://segmentfault.com/			-----遇到的问题
+五、nodeJS的安装
+	Mac系统的安装
+	windows系统的安装
+	其他系统的安装
+	参照网址：http://www.runoob.com/nodejs/nodejs-install-setup.html
+	
+	v6.9.5 LTS  v7.5.0 Current
+	偶数位为稳定版本：v6.8.x   v6.6.x   v6.4.x
+	基数位为非稳定版本：v6.9.x   v6.7.x   v6.5.x
+六、搭建第一个WEB服务器
+	查看端口被占用 8080
+		 win+R打开命令行窗口，
+		 netstat -ano|findstr "8080"	
+		 
+		 在任务管理器中消除掉即可
+
+
+	本地创建一个文件server.js,代码采用es6编写
+		const http = require("http");
+		const homename = "127.0.0.1";
+		const port = 3000;
+		const server = http.createServer((req,res)=>{
+			res.statusCode = 200;
+			res.setHeader("Content-Type","text/plain");
+			res.end("hello world");
+		});
+		
+		server.listen(port,hostname,()=>{
+			console.log(`server running at http://${hostname}:${port}/`);
+		})
+	es5的编写方法
+		var http = require('http');
+		http.createServer(function (request, response) {
+		
+			// 发送 HTTP 头部 
+			// HTTP 状态值: 200 : OK
+			// 内容类型: text/plain
+			response.writeHead(200, {'Content-Type': 'text/plain'});
+		
+			// 发送响应数据 "Hello World"
+			response.end('Hello World\n');
+		}).listen(8888);
+		
+		// 终端打印如下信息
+		console.log('Server running at http://127.0.0.1:8888/');
+七、命令行中体验
+	输入node即可进入控制台---交互式解释器--Node.js REPL
+	表示一个电脑的环境，类似 Window 系统的终端或 Unix/Linux shell，我们可以在终端中输入命令，并接收系统的响应。
+	Node 自带了交互式解释器，可以执行以下任务：
+		读取 - 读取用户输入，解析输入了Javascript 数据结构并存储在内存中。
+		执行 - 执行输入的数据结构
+		打印 - 输出结果
+		循环 - 循环操作以上步骤直到用户两次按下 ctrl-c 按钮退出。
+八、helloworld
+	创建一个文件hello.js,代码采用es5编写
+	//console.log("hello world");
+	启动一个服务器
+	"/favicon.ico"
+	打印两次helloworld
+	
+九、模块和包管理工具
+	commonJS规范
+		根据这个规范，每个文件就是一个模块，有自己的作用域。在一个文件里面定义的变量、函数、类，都是私有的，对其他文件不可见。
+		
+		依赖关系							定义    .js文件
+					      
+		命名空间		纠结的编程体验			暴露接口
+		
+		代码组织							引用
+		
+		
+		modules/pakages/system/filestems/binary/console/encodings/sockets/unit test...
+		
+		不同于jQuery，CommonJs是一套规范
+		
+	规范与实现的互为促进
+		nodeJS、Webpack都基于CommonJS规范,区别于AMD/CMD---require.js/sea.js
+		
+	使用npm install 来安装模块
+		使用镜像安装  cnpm install 
+	
+	案例展现
+		
+十、NPM使用
+	全局安装：相当于windows系统环境变量的配置
+	本地安装：不加后缀
+	安装：install
+	卸载：uninstall
+	安装模块：npm install n -g
+	升级node：n stable
+	安装Forever：cnpm install forever -g
+	本地安装underscore：cnpm install underscore
+	查看模块版本号：cnpm info underscore
+	选择版本安装：cnpm install underscore@1.0.3
+	查看安装了那些模块：cnpm list
+	如何管理模块package:cnpm init
+		dependencies:项目依赖，通过--save加进去
+		devDependencies：开发依赖，线上不需要---通过--dev加进去
+	删除node_modules文件夹，执行命令 cnpm install
+	只查看安装模块的中某一个模块的信息：cnpm list | grep gulp
+	查看版本标识:cnpm outdated
+	nrm模块--选择和切入源：cnpm install nrm -g
+		nrm list
+			nrm test----测试速度
+			nrm use npm
+			
+十一、nodejs API
+	1、url网址解析
+		url.parse(urlString[, parseQueryString[, slashesDenoteHost]])
+		url.format(urlObject)
+		url.resolve(from, to)
+		┌─────────────────────────────────────────────────────────────────────────────┐
+		│                                    href                                     │
+		├──────────┬┬───────────┬─────────────────┬───────────────────────────┬───────┤
+		│ protocol ││   auth    │      host       │           path            │ hash  │
+		│          ││           ├──────────┬──────┼──────────┬────────────────┤       │
+		│          ││           │ hostname │ port │ pathname │     search     │       │
+		│          ││           │          │      │          ├─┬──────────────┤       │
+		│          ││           │          │      │          │ │    query     │       │
+		"  http:   // user:pass @ host.com : 8080   /p/a/t/h  ?  query=string   #hash "
+		│          ││           │          │      │          │ │              │       │
+		└──────────┴┴────���──────┴──────────┴──────┴──────────┴─┴──────────────┴───────┘
+		(all spaces in the "" line should be ignored -- they are purely for formatting)
+		
+		https://www.baidu.com:8080/api.php?from=1000phone&course=nodejs#test
+		{
+			  protocol: 'https:',
+			  slashes: true,
+			  auth: null,
+			  host: 'www.baidu.com:8080',
+			  port: '8080',
+			  hostname: 'www.baidu.com',
+			  hash: '#test',
+			  search: '?from=1000phone&course=nodejs',
+			  query: { from: '1000phone', course: 'nodejs' },
+			  pathname: '/api.php',
+			  path: '/api.php?from=1000phone&course=nodejs',
+			  href: 'https://www.baidu.com:8080/api.php?from=1000phone&course=nodejs#test' }
+
+		
+		执行命令
+			node
+			url
+			url.parse("https://www.baidu.com")
+			url.parse("https://www.baidu.com:8080/api.php?from=qianfeng&course=node#level")-----query为字符串
+			url.parse("https://www.baidu.com:8080/api.php?from=qianfeng&course=node#level",true)-----query为对象
+			url.parse("https://www.baidu.com",true)
+			url.parse("//www.baidu.com:8080/api.php?from=qianfeng&course=node#level",true)--没有解析到协议和端口号
+			url.parse("//www.baidu.com:8080/api.php?from=qianfeng&course=node#level",true)--解析到host和port
+			将之前的解析出来的使用url.format()执行，可以解析出一个url地址
+			两段url解析成一个url.resolve("http://www.baidu.com","/api/list.php");
+		
+		url.resolve(from, to)
+			//加斜杠表示绝对路径，直接相对于域名或者端口号后边的内容直接放置，不加表示相对路径，最后一个斜杠后的内容将被替换
+			url.resolve() 方法会以一种 Web 浏览器解析超链接的方式把一个目标 URL 解析成相对于一个基础 URL。
+			url.resolve('/one/two/three', 'four')         // '/one/two/four'
+			url.resolve('http://example.com/', '/one')    // 'http://example.com/one'
+			url.resolve('http://example.com/one', '/two') // 'http://example.com/two'
+		
+	2、querystring网址：http://nodejs.cn/api/
+		querystring.escape(str)
+		querystring.parse(str[, sep[, eq[, options]]])
+		querystring.stringify(obj[, sep[, eq[, options]]])
+		querystring.unescape(str)
+			
+			node
+			querystring
+			querystring.stringify({name:"qianfeng",course:["nodejs","vue.js"],from:""})
+			querystring.stringify({name:"qianfeng",course:["nodejs","vue.js"],from:""},",")----设置分隔符
+			querystring.stringify({name:"qianfeng",course:["nodejs","vue.js"],from:""}，",",":")
+			querystring.parse(默认的字符串)
+			
+			querystring.escape({"from":"beijing"}});
+			querystring.escape("北京")
+	3、http模块
+		
+	4、http小爬虫
+		创建一个文件spider.js
+			网址：https://www.lagou.com
+			var http = require("http");
+			var https = require("https");
+			var url = "https://www.lagou.com";
+			https.get(url,function(res){
+				var html="";
+				res.on("data",function(data){
+					html+=data;
+				)
+				res.on("end",function(){
+					console.log(html);
+				})
+				res.on("error",function(err){
+					console.log(err);
+				})
+			})
+			
+		引入一个第三方工具
+			cnpm install cheerio --save-dev
+			注意：
+				--save表示安装到本地---项目依赖--dependencies
+				-dev表示安装到开发依赖----devDependencies---项目上线时不需要开发依赖
+			
+			var http = require("http");
+			var https = require("https");
+			var cheerio = require("cheerio");
+			var url = "https://www.lagou.com";
+			function filter(html){
+				var $ = cheerio.load(html);
+				var menu = $(".menu_main");
+				var menuData = [];
+				menu.each(function(index,value){
+					var menuTitle = $(value).find("h2").text();
+					var menuLists = $(value).find("a");
+					var menulist = [];
+					menuLists.each(function(index,value){
+						menulist.push($(value).text())
+					})
+					menuData.push({menuTitle:menuTitle,menulist:menulist})
+				})
+				return menuData
+				
+				
+			}
+			
+			https.get(url,function(res){
+				var html="";
+				res.on("data",function(data){
+					html+=data;
+				)
+				res.on("end",function(){
+					console.log(html);
+					var result = filter(html);
+					printMenu(result);
+				})
+				res.on("error",function(err){
+					console.log(err);
+				})
+			})
+			
+			function printMenu(menu){
+				menu.forEach(function(value){
+					console.log(value.menuTitle+"\n");
+					value.menuList.forEach(function(value){
+						console.log(value);
+					}
+					)
+				})
+			}
+
+	5、request方法
+		新建文件requestGet.js    https://developers.douban.com/wiki/?title=movie_v2#top250
+		请求的数据http://api.douban.com/v2/movie/top250
+		http://json.cn/
+		const https = require('https')
+		var options = {
+		  hostname: 'api.douban.com',
+		  port: 443,
+		  method: 'GET',
+		  path: '/v2/movie/top250'
+		}
+		var responseData = ''
+		var request = https.request(options, (response) => {
+		  // console.log(response)
+		  // console.log(response.statusCode)
+		  // console.log(response.headers)
+		  response.setEncoding('utf8')
+		  response.on('data', (chunk) => {
+		    responseData += chunk
+		  })
+		  response.on('end', () => {
+		    JSON.parse(responseData).subjects.map((item) => {
+		      console.log(item.title)
+		    })
+		  })
+		})
+		
+		request.on('error', (error) => {
+		  console.log(error)
+		})
+		
+		request.end()
+		
+		
+
+	7、event事件
+		events
+		使用事件：EventEmitter
+		事件的参数
+		只执行一个的事件监听器
+		
+		创建一个文件event_emitter.js
+			const EventEmitter = require('events')
+			class Player extends EventEmitter {}
+			var player = new Player()
+			player.once('play', (track) => {
+			  console.log(`正在播放:《${track}》`)
+			})
+			player.emit('play', '精绝古城')
+			player.emit('play', '黄皮子坟')
+
+	8、File System
+		得到文件与目录的信息：stat
+		创建一个目录：mkdir
+		创建文件并写入内容：writeFile,appendFile
+		读取文件的内容：readFile
+		列出目录的东西：readdir
+		重命名目录或文件：rename
+		删除目录与文件：rmdir,unlink
+			
+			创建fs_1.js---查看状态
+			
+				const fs = require('fs')
+
+				fs.stat('hello.js', (error, stats) =>{
+				  if(error){
+				    console.log(error)
+				  } else {
+				    console.log(stats)
+				    console.log(`文件：${stats.isFile()}`)
+				    console.log(`目录：${stats.isDirectory()}`)
+				  }
+				})
+			
+			创建fs_2.js---创建目录
+				const fs = require('fs')
+				fs.mkdir('logs', (error) => {
+				  if(error){
+				    console.log(error)
+				  } else {
+				    console.log('成功创建目录：logs')
+				  }
+				})
+			
+			创建fs_3.js---写入文件
+				const fs = require('fs')
+				fs.writeFile('logs/hello.log', '您好 ~ \n', (error) => {
+				  if(error) {
+				    console.log(error)
+				  } else {
+				    console.log('成功写入文件')
+				  }
+				})
+				
+				fs.appendFile('logs/hello.log', 'hello ~ \n', (error) => {
+				  if(error) {
+				    console.log(error)
+				  } else {
+				    console.log('成功写入文件')
+				  }
+				})
+
+			创建fs_4.js---读取文件
+				const fs = require('fs')
+				fs.readFile('logs/hello.log', 'utf8', (error, data) =>{
+				  if (error) {
+				    console.log(error)
+				  } else {
+				    console.log(data)
+				  }
+				})
+			创建fs_5.js---读取文件夹
+				const fs = require('fs')
+				fs.readdir('logs', (error, files) => {
+				  if (error) {
+				    console.log(error)
+				  } else {
+				    console.log(files)
+				  }
+				})
+			创建fs_6.js--文件重命名
+				const fs = require('fs')
+				fs.rename('logs/hello.log', 'logs/greeting.log', (error) =>{
+				  if (error) {
+				    console.log(error)
+				  } else {
+				    console.log('重命名成功')
+				  }
+				})
+
+			创建fs_7.js--删除目录
+				const fs = require('fs')
+				fs.readdirSync('logs').map((file) => {
+				  fs.unlink(`logs/${file}`, (error) => {
+				    if (error) {
+				      console.log(error)
+				    } else {
+				      console.log(`成功的删除了文件: ${file}`)
+				    }
+				  })
+				})
+				
+				fs.rmdir('logs', (error) =>{
+				  if (error) {
+				    console.log(error)
+				  } else {
+				    console.log('成功的删除了目录：logs')
+				  }
+				})
+	9、Stream
+		读取文件流
+		可读流的事件
+		可写的文件流
+		pipe
+		链式使用 pipe
+			
+			创建文件stream.js
+				const fs = require('fs')
+				var fileReadStream = fs.createReadStream('data.json')
+				var fileWriteStream = fs.createWriteStream('data-1.json')
+				var count = 0
+				fileReadStream.once('data', (chunk) => {
+     				console.log(chunk.toString())
+     				fileWriteStream.write(chunk)
+   				})
+				fileReadStream.on('data', (chunk) => {
+				    console.log(`${ ++count } 接收到：${chunk.length}`)
+				    fileWriteStream.write(chunk)
+				})
+				fileReadStream.on('end', () => {
+     				console.log('--- 结束 ---')
+   				})
+			 	fileReadStream.on('error', (error) => {
+				   	console.log(error)
+				})
+			流的操作
+				const fs = require('fs')
+				var fileReadStream = fs.createReadStream('data.json')
+				var fileWriteStream = fs.createWriteStream('data-1.json')
+				fileReadStream
+				  .pipe(fileWriteStream)
+			进一步处理---写入之前进行压缩
+				const fs = require('fs')
+				const zlib = require('zlib')
+				
+				var fileReadStream = fs.createReadStream('data.json')
+				var fileWriteStream = fs.createWriteStream('data.json.gz')
+				
+				fileWriteStream.on('pipe', (source) => {
+				  console.log(source)
+				})
+				
+				fileReadStream
+				  .pipe(zlib.createGzip())
+				  .pipe(fileWriteStream)
+十二、作业
+1、搭建Node.js开发环境
+2、复习课堂知识及运行案例
+3、理解复习第三节讲授的内容
+4、应用HTTP模块编写一个小爬虫工具
+要求：
+(1)利用爬虫获取“饿了么”首页列表数据
+(2)通过npm 安装 cheerio 模块获得数据
