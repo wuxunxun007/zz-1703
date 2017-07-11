@@ -32,10 +32,10 @@ http.createServer((req,res) => {
 //		Routes[pathname](res);
 		try{
 			//条件成立，也就是路由中定义了pathname时
-			Routes[pathname](res);
+			Routes[pathname](req,res);
 		}catch(e){
 			//没有条件满足时进行操作，路由中没有定义pathname时
-			Routes["other"](res);
+			Routes["other"](req,res);
 		}
 		
 //		res.write("hello route");

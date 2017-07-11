@@ -20,8 +20,8 @@
 		if(req.url !== "/favicon.ico"){
 			//继续操作
 		}
-	4、去/
-		var pathname = req.url.replace(/\//,"");
+	4、去/  第一个url代表的是url模块
+		var pathname = url.parse(req.url).pathname.replace(/\//,"");
 	5、依据pathname的值进行想前端输出不同的信息
 		switch (pathname){
 			case "login":
@@ -72,4 +72,61 @@
 		fs.readFile("path","utf-8",(err,data) => {if(err){}else{
 			res.write(data)     //当访问该路由的时候，实际显示的就是你写的那个html页面
 		}})
-	10、
+	10、此处需要使用一个封装的模块----文件读取模块--- Tools.js
+	11、Tool.js
+			var fs = require("fs");//*******切记一定要加
+			module.exports = {
+				readHtml:function(res,urlStr){
+					console.log("readHTml")
+					fs.readFile(urlStr,"utf-8",(err,data) => {
+						if(err){
+							console.log(err)
+						}else{
+							console.log(data)
+							res.write(data);
+							res.end();
+						}
+					})
+				}
+			}
+	12、登录注册----页面中提交的信息后台如何获取
+		数据提交方式
+			--- get
+				<form method="get" action="/login"></form>
+				var str = url.parse(req.url).query;
+				//用来获取用户的信息
+				var obj = url.parse(req.url,true).query;
+				//判断有没有用户信息，如果有则打印，没有则输出aaaa
+					str是不是等于null
+				不管怎么样，一定要注意调用
+					Tool.readHtml(res,"./views/login.html");
+			--- post
+				 formPost :function(req){
+				 	var str = "";
+				 	req.on("data",(data) => {
+				 		str += data;
+				 	})
+				 	req.on("end",() => {
+				 		
+				 		if(str == ""){
+				 			console.log("bbbbbb")
+				 		}else{
+				 			var obj = querystring.parse(str);
+				 			console.log("用户名为" + obj.userName);
+							console.log("密码为" + obj.pwd);
+				 		}
+				 	})
+				 }
+作业：
+1、练习路由
+2、实现登录注册，get/post
+3、安装mongodb
+	1.MongoDB下载地址：下载对应的版本 
+		https://www.mongodb.org/    =>download=>window=>download 
+		
+	2.安装 
+	按默认或选择安装位置一步步到头 
+	 
+	3.安装robomongo图形化工具 
+	   下载地址：http://www.softpedia.com/get/Internet/Servers/Database-Utils/Robomongo.shtml#download 
+	    安装后点create,在mongodb打开的情况下连接即可显示数据库 

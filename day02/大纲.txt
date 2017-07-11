@@ -136,7 +136,7 @@ http://localhost:8888/start?foo=bar&hello=world
 		  </form>
 	更改路由router.js中的login方法
 		login:function(req,res){
-			var urlObject = url.parse(req.url,true).query;
+			var urlObject = url.parse(req.url,true);
 			console.log(urlObject.email)
 			console.log(urlObject.password)
 			file.readFile("./views/login.html",res,req);

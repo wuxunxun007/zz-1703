@@ -17,10 +17,12 @@
 		</style>
 	</head>
 	<body>
-		<input type="text" id="userName" value="" placeholder="用户名" />
+		<form method="get" action="/login">
+			<input type="text"  name="userName" value="" placeholder="用户名" />
 		
-		<input type="password" name="pwd" id="pwd" value="" placeholder="密码" />
-		<input type="button" name="loginBtn" id="loginBtn" value="登录"  />
+			<input type="password" name="pwd"  value="" placeholder="密码" />
+			<input type="submit"  value="登录"  />
+		</form>
 		
 		<a href="/index">首页</a>
 	</body>
