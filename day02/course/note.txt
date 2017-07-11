@@ -1,0 +1,75 @@
+一、路由
+	http://www.**.com/api
+	http://www.**.com/docs
+	http://www.**.com/a
+	http://www.**.com/b
+	
+	/api    /docs   /a   /b     -------------  node服务器的路由
+	
+	****
+		每次修改完文件需要重新启动服务器，特别麻烦
+			cnpm i supervisor -g     全局安装supervisor
+			supervisor 01server.js     使用supervisor代替node命令，以后相同的一个文件不需要不断的重启----热替换（watch）
+	****
+		
+	1、搭建基本的服务器
+	2、输出用户地址栏输入的地址
+		console.log(req.url)
+			---- 每一个都有两个请求
+	3、过滤请求
+		if(req.url !== "/favicon.ico"){
+			//继续操作
+		}
+	4、去/
+		var pathname = req.url.replace(/\//,"");
+	5、依据pathname的值进行想前端输出不同的信息
+		switch (pathname){
+			case "login":
+				Routes.login(res)
+				break;
+			case "register":
+				Routes.register(res)
+				break;
+			case "kind":
+				Routes.kind(res)
+				break;
+			default:
+				break;
+		}
+	6、如果把所有的路由都放在这个页面，显得太臃肿，------   模块化开发
+	7、创建一个路由模块   ---  Routes.js
+		每一个方法--键值对----键名就是pathname的值
+		module.exports = {
+			"login":function(res){
+				res.write("登录");
+				res.end();
+			},
+			"register":function(res){
+				res.write("注册");
+				res.end();
+			},
+			"kind":function(res){
+				res.write("分类");
+				res.end();
+			},
+			"other":function(res){
+				res.write("404");
+				res.end();
+			}
+		}
+	8、调用------异常处理机制 ---- try{}catch(e){}
+		try{
+			//条件成立，也就是路由中定义了pathname时
+			Routes[pathname](res);
+		}catch(e){
+			//没有条件满足时进行操作，路由中没有定义pathname时
+			Routes["other"](res);
+		}
+		
+	9、现在需要实时显示真实的页面------fs模块中的读物文件 ---- java（jsp）---- Struts、Hibernate、Spring
+	（10年的工作经验不等于1年的工作经验用了10年）----广度、深度
+	高内聚-低耦合
+		fs.readFile("path","utf-8",(err,data) => {if(err){}else{
+			res.write(data)     //当访问该路由的时候，实际显示的就是你写的那个html页面
+		}})
+	10、
