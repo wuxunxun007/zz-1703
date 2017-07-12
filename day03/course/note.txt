@@ -1,0 +1,67 @@
+1、下载安装mongodb
+2、在系统的根目录下创建一个data文件夹，在文件夹下创建一个db文件夹
+3、制作.bat文件    ---  快速执行文件
+	新建一个txt文本文件  （data文件夹下）---- 注意字符编码集   ---- utf-8格式 --- 我得mongodb装载了D盘
+		d:
+		cd '.\Program Files\' 
+		cd .\MongoDB\
+		cd .\Server\
+		cd .\3.4\
+		cd .\bin\
+		mongod.exe --dbpath f:data/db
+	另存为startMongodb.bat
+		修改最后一行为
+		mongo.exe
+	另存为mongo.bat
+4、先打开startMongodb.bat ----- 启动数据库
+5、打来mongo.bat  --- 操作数据库
+6、学习命令
+	数据库 office-access  sqlserver mysql oracle sqlite(手机中使用)
+	本地存储 cookie webStorage(localStorage/sessionStorage) websql indexedDB
+		cookie webStorage
+	
+	mongodb
+	   	非关系型数据库
+	sql
+		关系型数据库 
+		
+	术语介绍
+	  SQL            mongoDB			 说明
+	database		 database			数据库
+	table			 collection			表/集合
+	row				 document			行/文档
+	column			 field				字段（列）/域
+	index			 index				索引
+	primary key	     primary key		主键，mongdb中_id作为主键
+7、数据库常用命令
+	1、help查看命令提示
+		help  常用的命令
+		db    显示当前的数据库的名称 --- 默认是test表
+		db.help()   显示当前数据库的所有的使用方法
+		db.test.help()   显示的是当前数据库下边的test集合（表）的所有的使用方法
+		db.test.find().help()  查询当前数据库下的test集合的所有的数据的方法
+	2、创建、切换数据库
+		use movies   无则创建并且切换，有则切换
+		db   ----- movies
+			注意：如果初次创建的数据库，并不能直接看到，你需要添加一些集合（表），意味着有了数据
+		添加一个集合
+			db.createCollection("movie"); 此时就可以在图形化工具中查看到这个数据库及其集合（表）
+			db.createCollection("collName", {size: 20, capped: true, max: 100});//一般不要设置
+								数据库集合的名称
+		显示当前所有数据库的名称
+			show dbs
+			
+			use musics
+			db.createCollection("list")
+			show dbs		
+		图像化工具中创建了users数据库，并且添加了一个集合list	
+		显示当前DB状态
+			db.stats()	
+		查看当前DB版本
+			db.version()
+		查看当前DB的链接机器地址
+			db.getMongo()
+		删除数据库
+			db.dropDatabase()   ----  删除了数据，未删除数据库
+		查询当前所使用的数据库
+			db.getName()   ---- 相当于db
