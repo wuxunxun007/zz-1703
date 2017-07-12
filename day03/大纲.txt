@@ -64,7 +64,7 @@
 		插入多条数据db.users.insertMany([{},{}])
 	
 	2、更新文档
-		db.users.updaeMany({},{$set:{class:"1638"}})
+		db.users.updateMany({},{$set:{class:"1638"}})
 		
 		//false表示如果不存在不会插入，true表示如果有多个内容都更新（如果为false，则只更新第一条）
 		db.users.update({age: 25}, {$set: {name: 'changeName'}}, false, true);

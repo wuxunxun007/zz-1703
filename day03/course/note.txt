@@ -21,9 +21,9 @@
 		cookie webStorage
 	
 	mongodb
-	   	非关系型数据库
+	   	非关系型数据库  insert/save  remove   update  find
 	sql
-		关系型数据库 
+		关系型数据库  insert  delete  update query(select)
 		
 	术语介绍
 	  SQL            mongoDB			 说明
@@ -65,3 +65,157 @@
 			db.dropDatabase()   ----  删除了数据，未删除数据库
 		查询当前所使用的数据库
 			db.getName()   ---- 相当于db
+8、插入数据    ----   增
+	1、插入单条数据
+		use movies
+		db.createCollection("elelist")
+		db.elelist.save({})   -----  插入单条数据   ----- 对象
+		db.elelist.insert({})  -----  插入单条数据 ----- 对象
+	2、插入多条数据
+		db.elelist.insertMany([{},{},{}])  -----  插入多条数据   ----- 数组对象
+		
+		***
+			save insert  二者的区别？
+		***
+9、查询数据 -----    查
+	查询集合中的所有的数据（包括所有的字段）
+		db.elelist.find()    ---  结果是没有使用任何符号相连接的，每一个对象又叫做一个document(文档----行)
+			{} {} {}
+	指定字段查询  ---  name字段
+		db.elelist.find({},{"name":1,"_id":0})
+			find 有两个参数，第一个为空对象，第二个为一个条件选项，需要的字段设置为1，不需要的设置为0，默认所有的数据都是1，一旦设置第二个参数，那么只有为1的字段和_id这个字段会出现，一般情况下会将_id字段设置为0
+	指定字段并且指定字段的值的查询
+		db.elelist.find({"name":"下午茶"},{"name":1,"_id":0})
+			查询到所有的name字段为下午茶的数据，并且只显示name字段
+			
+		db.elelist.find({"name":"下午茶"})
+			查询到所有的name字段为下午茶的数据-----数据不易观察
+			
+		db.elelist.find({"business_flag":1},{"_id":0,"name":1})
+			查询到所有的business_flag字段为1的数据，并且只显示name字段
+			
+	查询business_flag字段的值大于为5的数据
+		db.elelist.find({"business_flag":{$gt:5}},{"_id":0,"name":1})
+		  	****  大于5的部分用对象实现，对象内部大于用$gt
+		  	
+	查询business_flag字段的值小于为5的数据
+		db.elelist.find({"business_flag":{$lt:5}},{"_id":0,"name":1})
+		  	****  小于5的部分用对象实现，对象内部大于用$lt
+		  	
+	查询business_flag字段的值大于等于为14的数据
+		db.elelist.find({"business_flag":{$gte:14}},{"_id":0,"name":1})
+		  	****  大于等于为14的部分用对象实现，对象内部大于用$gte
+		  	
+	查询business_flag字段的值小于等于为14的数据
+		db.elelist.find({"business_flag":{$lte:14}},{"_id":0,"name":1})
+		  	****  小于等于为14的部分用对象实现，对象内部大于用$lte
+	
+	查询business_flag为1“并且”name为美食的数据
+		db.elelist.find({"business_flag":1,"name":"美食"})
+		db.elelist.find({"business_flag":1,"name":"美食"},{"_id":0,"name":1})
+	
+	查询business_flag为1“或者”name为美食的数据
+		db.elelist.find({$or:[{"business_flag":1},{"name":"美食"}]})
+		db.elelist.find({$or:[{"business_flag":1},{"name":"美食"}]},{"_id":0,"name":1})
+			***$or 对应的是数组，将每一个条件对象组成的数组作为$or所对应的值
+	
+	查询business_flag值为5-14的数据
+		db.elelist.find({"business_flag":{$lte:14,$gte:5}},{"_id":0,"name":1})   })  })
+	
+	查询去重后数据 business_flag 为1的数据   ----- 4个1
+		db.elelist.distinct("business_flag")
+			先将这个字段的值都取出来存到一个数组中，然后在数组去重--- [ 1, 14, 9, 10, 11, 18, 19 ]
+	
+	查询name中包含"午"的数据 ---- 模糊查询
+		db.elelist.find({"name":/午/},{"name":1,"_id":0})
+		
+	查询name中包含"午"的数据，并且午在开头 ---- 模糊查询
+		db.elelist.find({"name":/^午/},{"name":1,"_id":0})
+		
+	查询 business_flag 排序后数据   
+		db.elelist.find({},{"business_flag":1,"name":1}).sort({"business_flag":1});   ---升序
+		db.elelist.find({},{"business_flag":1,"name":1}).sort({"business_flag":-1});  ---降序
+		
+	查询前5条数据
+		db.elelist.find({},{"name":1,"_id":0}).limit(5)   ----   包括第5条数据
+		
+	查询10条以后的数据
+		db.elelist.find({},{"name":1,"_id":0}).skip(10);    ---- 不包括第10条
+		
+	查询在6-11之间的数据    ----  7 8 9 10 11   ----  分页数据（每一个显示10条数据）
+		db.elelist.find({},{"name":1,"_id":0}).limit(5).skip(6);
+			db.elelist.find({},{"name":1,"_id":0}).limit(10).skip(0 * 10);
+			db.elelist.find({},{"name":1,"_id":0}).limit(10).skip(1 * 10);
+			db.elelist.find({},{"name":1,"_id":0}).limit(10).skip(2 * 10);
+	
+	查询第一条数据
+		db.elelist.findOne({},{"name":1,"_id":0});
+		
+	查询某个结果集的记录条数   
+		db.elelist.find({},{"name":1,"_id":0}).count();    ----   14     -----商品的总数量（每页显示的个数，求出总共有多少页（向上取整  Math.ceil()））
+		db.elelist.find({"business_flag":1},{"name":1,"_id":0}).count();    ---4
+		
+	按照某列进行排序计数   ----  所有的数据中包含有business_flag这个字段的数据的个数
+		db.elelist.find({business_flag: {$exists: true}}).count();     ---10
+10、更新数据  ----    改
+	更新business_flag为14的数据，让他的name+1   ----- 新店特惠1
+		db.elelist.update({"business_flag":14},{$set:{"name":"新店特惠1"}})
+			WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 0 })
+		db.elelist.update({"business_flag":14},{$set:{"name":"新店特惠2"}},false)
+			false表示如果不存在不会插入
+			WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+		db.elelist.update({"business_flag":14},{$set:{"name":"新店特惠2"}},true)
+			WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 0 })
+				跟默认情况下是一致的，也就是update函数的第三个参数默认为true
+		db.elelist.update({"business_flag":2},{$set:{"name":"新店特惠22"}})
+			如果没有数据，相当于第三个参数设置为false
+			WriteResult({ "nMatched" : 0, "nUpserted" : 0, "nModified" : 0 })
+		db.elelist.update({"business_flag":2},{$set:{"name":"新店特惠22"}},true)
+			如果第三个参数为true,表示如果没有这一条数据，那么就会创建并且插入数据
+			WriteResult({
+		        "nMatched" : 0,
+		        "nUpserted" : 1,
+		        "nModified" : 0,
+		        "_id" : ObjectId("5965eb237804853b07edc881")
+			})
+		db.elelist.update({"business_flag":3},{$set:{"name":"新店特惠33"}},false)
+			WriteResult({ "nMatched" : 0, "nUpserted" : 0, "nModified" : 0 })
+				因为第三个参数设置为false,并且查询不到条件字段所对应的值的数据，所以不会插入新的数据
+		
+		db.elelist.update({"business_flag":1},{$set:{"name":"更新的数据"}},false,true)
+			WriteResult({ "nMatched" : 4, "nUpserted" : 0, "nModified" : 4 })
+			将所有满足条件的数据的name值都改为了更新的数据
+		
+		db.elelist.update({"business_flag":1},{$set:{"name":"美食"}},false,false)
+			WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+			只更新第一条数据为美食
+	
+	更新多条数据
+		db.elelist.update({"business_flag":1},{$set:{"name":"更新的数据"}},false,true)
+			WriteResult({ "nMatched" : 4, "nUpserted" : 0, "nModified" : 4 })
+			将所有满足条件的数据的name值都改为了更新的数据
+		
+		db.elelist.updateMany({},{$set:{"discount":0.3}})	
+			{ "acknowledged" : true, "matchedCount" : 15, "modifiedCount" : 15 }
+			更新了15条数据，每一个条数据都添加了一个字段discount，值为0.3
+	
+	需要将所有的business_flag的值都加1
+		db.elelist.update({},{$inc:{business_flag:1}},false,true)
+			WriteResult({ "nMatched" : 15, "nUpserted" : 0, "nModified" : 15 })
+			15条数据都加1操作   如果没有字段则添加了字段
+	需要将所有的business_flag的值都减1
+		db.elelist.update({},{$inc:{business_flag:-1}},false,true)
+			WriteResult({ "nMatched" : 15, "nUpserted" : 0, "nModified" : 15 })
+		db.elelist.update({},{$inc:{test:-1}},false,true)
+		
+11、删除数据  ----   删
+	删除单条数据
+		db.elelist.remove({name:"新店特惠22"})
+		
+		db.elelist.update({"business_flag":2},{$set:{"name":"新店特惠22"}},true)
+	
+	删除多条数据
+		db.elelist.deleteMany({"business_flag":2})
+		
+	删除所有
+		db.elelist.remove({})	
