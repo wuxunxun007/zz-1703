@@ -1,0 +1,99 @@
+一、nodejs 与 mongodb 的连接
+	1、安装mongodb模块
+		cnpm i mongodb --save
+			--save   ----   -S    ---项目依赖
+			
+	2、数据库连接步骤
+		var MongoClient = require("mongodb").MongoClient;
+		var DB_CONN_STR = 'mongodb://localhost:27017/movies';
+		MongoClient.connect(DB_CONN_STR,(err,db) => {
+		if(err){
+				console.log(err)
+			}else{
+				console.log("数据库连接成功")
+				//后续操作
+				db.close();
+			}
+		})
+	3、插入数据
+		var insertData = function(db, callback) {  
+		    //连接到表 site
+		    var collection = db.collection('site');
+		    //插入数据
+		    var data = [{"name":"菜鸟教程","url":"www.runoob.com"},{"name":"菜鸟工具","url":"c.runoob.com"}];
+		    collection.insert(data, function(err, result) { 
+		        if(err)
+		        {
+		            console.log('Error:'+ err);
+		            return;
+		        }     
+		        callback(result);
+		    });
+		}
+		//后续操作
+		 insertData(db, function(result) {
+	        console.log(result);
+	        db.close();
+	    });
+	4、查询数据
+		var selectData = function(db, callback) {  
+		  //连接到表  
+		  var collection = db.collection('site');
+		  //查询数据
+		  var whereStr = {"name":'菜鸟教程'};
+		  collection.find(whereStr).toArray(function(err, result) {
+		    if(err)
+		    {
+		      console.log('Error:'+ err);
+		      return;
+		    }     
+		    callback(result);
+		  });
+		}  
+		//后续操作  	
+		selectData(db, function(result) {
+		    console.log(result);
+		    db.close();
+	  	});
+	  	
+二、express 框架
+	连接地址：http://www.expressjs.com.cn/
+	基于 Node.js 平台，快速、开放、极简的 web 开发框架。
+	1、安装
+		mkdir express
+		cd express
+		cnpm init
+		cnpm install express --save
+	2、hello world
+		mkdir helloworld
+		cd helloworld
+			var app = require("express")();
+			app.get("/",(req,res) => {
+				res.send("hello world");
+			})
+			//... get("/login")  get("/register")
+			app.listen(3000,() => {
+				console.log("your server is running at http://localhost:3000")
+			})
+		node app.js
+	3、应用生成器
+		cnpm install express-generator -g
+		express -h   出现命令则代表安装成功
+		mkdir myapp
+			cd myapp
+			
+			express jadeapp   ----  生成一个项目名称为jadeapp的应用
+				安装项目依赖
+					cd jadeapp 
+					cnpm install
+				运行app
+					cnpm run start
+				
+				在package.json文件scripts选项中添加
+					"scripts": {
+					    "start": "node ./bin/www",
+					    "dev":"supervisor ./bin/www"
+					  },
+				cnpm run dev
+作业：
+	1、封装更新、删除模块
