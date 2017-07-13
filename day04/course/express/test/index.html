@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<ul id="list">
+			<li></li>
+		</ul>
+	</body>
+	<script src="jquery-1.11.0.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		$.ajax({
+			type:"get",
+			url:"http://localhost:3000/getEleList",
+			success:function(data){
+				console.log(data)
+//				for(var i = 0;i < data.length; i++){
+//					
+//				}
+//				for(var i in data){
+//					
+//				}
+				for(var item of data){
+					$("#list").append('<li>'+item.name+'</li>')
+				}
+			}
+		});
+	</script>
+</html>

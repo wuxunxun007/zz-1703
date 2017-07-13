@@ -1,4 +1,5 @@
 一、nodejs 与 mongodb 的连接
+	地址：http://www.runoob.com/nodejs/nodejs-mongodb.html
 	1、安装mongodb模块
 		cnpm i mongodb --save
 			--save   ----   -S    ---项目依赖
@@ -95,5 +96,117 @@
 					    "dev":"supervisor ./bin/www"
 					  },
 				cnpm run dev
+		项目结构解析
+			.
+			├── app.js       引入需要使用的模块 ，定义中间件，方便我们使用
+			├── bin
+			│   └── www      创建服务器使用
+			├── package.json 项目描述文件，快速执行命令，项目的依赖模块，开发依赖的模块
+			├── public       静态资源文件
+			│   ├── images   
+			│   ├── javascripts
+			│   └── stylesheets
+			│       └── style.css
+			├── routes      路由
+			│   ├── index.js  相关index的路由
+			│   └── users.js  相关user的路由
+			└── views       页面模板---jade的模板
+			    ├── error.jade
+			    ├── index.jade
+			    └── layout.jade
+		
+		jade模板
+			地址：http://cnodejs.org/topic/5368adc5cf738dd6090060f2
+		ejs模板
+			地址：https://www.w3cschool.cn/weflow/weflow-ejs.html
+			course/express/myapp
+			
+			express myejsapp -e     -e代表的就是创建一个ejs模板
+				views文件夹下的页面此时都是ejs模板的，跟我们的html页面很像
+		
+			views文件夹下的index.ejs中有
+				<%= title %>  表示的就是变量title,来源于routes/index.js
+					router.get('/', function(req, res, next) {
+						//render函数代表渲染了一个页面index.ejs（.ejs可以省略），需要传递的参数使用第二个参数传递
+					  res.render('index', { title: 'Express' });
+					});		
+			index.js中定义一个数组
+				var arr = [1,2,3,4,5] 
+				res.render('index', { title: 'Express',data:arr });
+				
+			输出语句：
+				<%=  data  %>   在页面中输出变量值-----如果参数中带有html标签，不会被解析  <h1> &lt;h1&gt;
+				<%-  data  %>   如果不希望变量值的内容被转义 ----- html标签会被解析
+			<% %>内部可以直接使用js语句，在当前ejs页面内部可以访问这个变量，如果未定义直接使用不会报错，只不过数据不会打印
+				<% var name = "express-ejs真牛" %>
+    			<div>Hello, My Name is <%-name %></div>
+    		循环 ---  直接先写一个正常js循环语句，給for这一行加 <% %> ,給中间的参数加<%-  %>
+    			<ul>
+				    <% for(var i = 0; i < 10; i++) {%>
+				    <li>我是列表 <%-i %></li>
+				    <% } %>
+				<ul>
+				<% for(var i = 0; i < data.length; i++){%>    data为一个变量，此变量为数组
+			    	<h3><%- data[i] %></h3>
+			   <% }%>
+			   
+			给前端提供接口时，会遇到跨域的问题，在app.js中添加如下代码----一定要放在路由之前
+				路由：app.use('/', index); ---在跨域位置后
+				app.all('*', function(req, res, next) {
+				    res.header("Access-Control-Allow-Origin", "*");
+				    res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+				    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+				    res.header('Access-Control-Allow-Headers', 'Content-Type');
+				    next();
+				});
+三、前后端接口合作
+	1、express myapp -e
+	2、cd myapp
+	3、cnpm i
+	4、添加dev:"supervisor ./bin/www"
+	5、app.js中添加
+		app.all('*', function(req, res, next) {
+		    res.header("Access-Control-Allow-Origin", "*");
+		    res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+		    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+		    res.header('Access-Control-Allow-Headers', 'Content-Type');
+		    next();
+		});
+	6、注册功能
+		routes/users.js
+		新添加了一个路由
+		router.get('/register', function(req, res, next) {});
+	7、建立数据库连接
+	8、前端提交数据使用get，后端可以直接通过req.url获取到前端所提交的数据
+	9、将提交的数据进行查询，以username查询
+	10、如果查询结果的长度为0，则表示没有此用户注册过，可以进行注册操作（插入数据），返回1，表示注册成功
+	11、如果长度不为0，则表示用户已经注册过，进行返回0，那么0就表示用户名已存在
+	12、前端进行正则验证输入的正确性
+	13、如果输入符合格式，那么提交数据到服务器   http://localhost:3000/users/register
+	14、如果返回的数据为0，则提示此用户名已经存在，执行下一步操作（请输入另一个账号，并且清空用户名那一栏）
+	15，如果返回的数据为1，则表示注册成功，进行下一步操作（跳转到首页，跳转到登录页面）
+	16、为了增强用户体验，添加了超时设置和交互设置
+		timeout
+		beforeSend	
 作业：
 	1、封装更新、删除模块
+	2、登录操作和忘记密码功能
+		登录操作
+			前端请求跟注册一样
+			后端
+				写一个接口
+					router.get('/login', function(req, res, next) {});
+				建立数据库连接
+				前端提交数据使用get，后端可以直接通过req.url获取到前端所提交的数据
+				将提交的数据进行查询，以username查询，如果没有，则告诉用户换没有注册
+				如果有，则继续username和pwd集合查询，如果有，则表示登录成功，进行下一步操作，
+				如果没有则表示密码错误，提示用户修改密码或者重新输入密码
+		修改密码
+			写一个接口
+				router.get('/forgetPwd', function(req, res, next) {});
+			建立数据库连接
+			前端提交数据使用get，后端可以直接通过req.url获取到前端所提交的数据
+			查询用户名usernme是不是存在，如果不存在，告诉用户注册都没有，哪来的修改密码
+			如果存在，调用修改模块，以username作为条件，修改密码
+				collection.update({"username":"***"},{$set:{"pwd":"****"}})
+			告诉用户使用新密码登录即可

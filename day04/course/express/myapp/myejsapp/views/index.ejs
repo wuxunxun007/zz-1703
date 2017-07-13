@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1><%= title %>------<%= classid %> ---- </h1>
+    <%- course %>
+    <p>Welcome to <%= title %></p>
+    <p>测试</p>
+    <p><%= data %></p>
+    
+    
+    <% var name = "express-ejs真牛" %>
+    <div>Hello, My Name is <%-name %></div>
+    
+    
+    <% for(var i = 0; i < 10; i++){ %>
+    	<p>这个值为<%- i %></p>
+     <% } %>
+    
+   <% for(var i = 0; i < data.length; i++){%>
+    	<h3><%- data[i] %></h3>
+   <% }%>
+  </body>
+</html>

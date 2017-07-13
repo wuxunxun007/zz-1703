@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="dist/css/bootstrap.min.css"/>
+		<style type="text/css">
+			.offsetTop100{
+				margin-top: 100px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<h1 class="text-center">*** 注册</h1>
+			<form class="col-xs-offset-3 col-xs-6 offsetTop100">
+			  <div class="form-group">
+			    <label for="username">用户名</label>
+			    <input type="text" class="form-control" id="username" placeholder="用户名">
+			  </div>
+			  <div class="form-group">
+			    <label for="pwd">密码</label>
+			    <input type="password" class="form-control" id="pwd" placeholder="密码">
+			  </div>
+			  <div class="checkbox">
+			    <label>
+			      <input type="checkbox" checked> 已阅读*****协议
+			    </label>
+			  </div>
+			  <div class="form-group">
+			    <input type="button" class="form-control btn btn-primary " id="btn" value="注册">
+			  </div>
+			</form>
+		</div>
+	</body>
+	<script src="jquery-1.11.0.js" type="text/javascript" charset="utf-8"></script>
+	<script src="dist/js/bootstrap.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		$("#btn").on("click",function(){
+			var username = $("#username").val();
+			var pwd = $("#pwd").val();
+			if(username == "" || pwd == "" ){
+				alert("信息填写不完整")
+			}else{
+				$.ajax({
+					method:"get",
+					timeout : 10000, //超时时间设置，单位毫秒
+					data:{
+						username:username,
+						pwd:pwd
+					},
+					beforeSend:function(){
+						$("#btn").val("正在注册...");
+						$("#btn").attr("disabled","disabled");
+					},
+					url:"http://localhost:3000/users/register",
+					success:function(data){
+						$("#btn").val("注册")
+						$("#btn").removeAttr("disabled")
+						console.log(data)
+						switch (data){
+							case "0":
+								alert("用户名已存在")
+								break;
+							case "1":
+								alert("注册成功")
+								break;
+							default:
+								break;
+						}
+					},
+					complete : function(XMLHttpRequest,status){ //请求完成后最终执行参数
+					　　　　if(status=='timeout'){//超时,status还有success,error等值的情况
+								$("#btn").val("注册")
+								$("#btn").removeAttr("disabled")
+					　　　　　  alert("超时");
+					　　　　}
+					　　}
+				})
+			}
+			
+		})
+	</script>
+</html>

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1><%= data %></h1>
+    <ul>
+    	<% for(var i = 0; i < data.length; i++){ %>
+    		<li><%- data[i].name %></li>
+    	<% } %>
+    	
+    </ul>
+  </body>
+</html>
