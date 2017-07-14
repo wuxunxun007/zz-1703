@@ -1,0 +1,79 @@
+一、socket通讯
+	网络上的两个程序通过一个"双向的通信连接"实现数据的交换，这个连接的一端称为一个socket
+	服务端：发送数据
+	客户端：接受数据
+		如果你此时是发送数据，那么你就是服务端，如果是接受数据，那么你就是客户端
+	建立网络通信连接至少要一对端口号(socket)
+		饿了么客户端，商户端、配送端，服务端-----匹配端口号，否则会很麻烦
+	socket通讯-----即时通讯（及）----立即----微信、QQ、阿里旺旺、飞秋、飞信....
+		----js 中的观察者模式的使用 
+			on/emit
+	socket本质是编程接口(API)，对TCP/IP的封装，TCP/IP也要提供可供程序员做网络开发所用的接口，这就是Socket编程接口；
+		(计算机网络  Tcp   Udp)
+	HTTP是轿车，提供了封装或者显示数据的具体形式;
+	Socket是发动机，提供了网络通信的能力。
+二、nodejs中如果使用socket
+	socket.io
+		https://socket.io/
+		https://socket.io/get-started/chat/
+		实时分析
+			将数据推送到被表示为实时计数器，图表或日志的客户端。
+				金融市场，股票
+		即时通讯和聊天
+			Socket.IO的“Hello world”是一个聊天应用程序，只需几行代码。
+		二进制流
+			从1.0开始，可以来回发送任何blob：图像，音频，视频。
+		文件合作
+			允许用户同时编辑文档并查看对方的更改。
+三、聊天室
+	mkdir chat
+	cd chat
+	cnpm init   ----  创建一个描述文件   package.json
+	cnpm install --save express@4.15.2
+		安装express,安装版本为4.15.2
+	创建index.js
+		var express = require("express");
+		var app = express();
+		//express写的服务器的协议为http
+		var http = require('http').Server(app);
+		app.get('/', function(req, res){
+			res.send('<h1>Hello world</h1>');
+		});
+		//http监听的端口号
+		http.listen(3000,() => {
+			var str = "your server is running at :"
+			var host = "http://localhost:3000"
+			//es6 字符串模板
+				/**
+				 * 将变量使用${str}
+				 * ``符号
+				 */
+			console.log(`${str} ${host}`)
+		})
+	node index
+	
+	如果将所有的html代码片段都放在后台程序中，使用send方法，那么会显得极其混乱，并且极易出错
+	引入sendFile()可以读取前端的页面---- 类似于render，但是不能用render（没有html模块）
+	路由中改造
+		res.sendFile(__dirname + "/index.html");
+			__dirname    得到的是当前文件夹的目录-----绝对地址----双下划线
+	集成socket.io
+		与Node.JS HTTP Server集成（或挂接）的服务器： socket.io
+		在浏览器端加载的客户端库： socket.io-client
+	安装socket.io
+		cnpm install --save socket.io
+	index.js中使用socket.io
+		var io = require('socket.io')(http);
+
+	监听函数connection，当有用户连接进来时就会触发这个函数
+		io.on('connection', function(socket){
+		  console.log('a user connected');
+		});
+	index.html代码中添加socket.io的客户端并且实例化
+		<script src="/socket.io/socket.io.js"></script>
+		<script>
+		  var socket = io();
+		</script>
+作业
+	添加昵称
+	添加谁在线
