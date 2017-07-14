@@ -1,0 +1,6 @@
+分类导航
+	https://mainsite-restapi.ele.me/shopping/v2/entries?latitude=34.800156&longitude=113.660554&templates[]=main_template
+热搜
+https://mainsite-restapi.ele.me/shopping/v3/hot_search_words?latitude=34.800156&longitude=113.660554
+列表
+https://mainsite-restapi.ele.me/shopping/restaurants?latitude=34.800156&longitude=113.660554&offset=40&limit=20&extras[]=activities&terminal=h5
